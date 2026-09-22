@@ -2,7 +2,7 @@
  "format": "gya-cms-seed",
  "version": 1,
  "site": "avanti",
- "generated": "2026-09-22T03:28:23.986Z",
+ "generated": "2026-09-22T06:09:12.903Z",
  "categories": [
   {
    "slug": "mailer-boxes",
@@ -288,7 +288,18 @@
      "alt": null
     }
    ],
-   "templates": []
+   "templates": [
+    {
+     "label": "1400 × 850 mm",
+     "url": "2025/07/ARTWORK-SPEC-FORM-Roll-Up-Banner-1400x850mm.pdf",
+     "size_key": null
+    },
+    {
+     "label": "2200 × 850 mm",
+     "url": "2025/07/ARTWORK-SPEC-FORM-Roll-Up-Banner-2200x850mm.pdf",
+     "size_key": null
+    }
+   ]
   },
   {
    "slug": "premium-pull-up-banner-stands",
@@ -398,7 +409,18 @@
      "alt": null
     }
    ],
-   "templates": []
+   "templates": [
+    {
+     "label": "1400 × 850 mm",
+     "url": "2025/07/ARTWORK-SPEC-FORM-Roll-Up-Banner-1400x850mm.pdf",
+     "size_key": null
+    },
+    {
+     "label": "2200 × 850 mm",
+     "url": "2025/07/ARTWORK-SPEC-FORM-Roll-Up-Banner-2200x850mm.pdf",
+     "size_key": null
+    }
+   ]
   },
   {
    "slug": "double-sided-standard-pull-up-banner-stand",
@@ -493,7 +515,18 @@
      "alt": null
     }
    ],
-   "templates": []
+   "templates": [
+    {
+     "label": "1400 × 850 mm",
+     "url": "2025/07/ARTWORK-SPEC-FORM-Roll-Up-Banner-1400x850mm.pdf",
+     "size_key": null
+    },
+    {
+     "label": "2200 × 850 mm",
+     "url": "2025/07/ARTWORK-SPEC-FORM-Roll-Up-Banner-2200x850mm.pdf",
+     "size_key": null
+    }
+   ]
   },
   {
    "slug": "double-sided-premium-pull-up-banner-stand",
@@ -583,7 +616,18 @@
      "alt": null
     }
    ],
-   "templates": []
+   "templates": [
+    {
+     "label": "1400 × 850 mm",
+     "url": "2025/07/ARTWORK-SPEC-FORM-Roll-Up-Banner-1400x850mm.pdf",
+     "size_key": null
+    },
+    {
+     "label": "2200 × 850 mm",
+     "url": "2025/07/ARTWORK-SPEC-FORM-Roll-Up-Banner-2200x850mm.pdf",
+     "size_key": null
+    }
+   ]
   },
   {
    "slug": "custom-branded-mailer-boxes",
@@ -13284,63 +13328,27 @@
  ],
  "seo_entries": [
   {
-   "route": "/blog/pull-up-banners-that-get-read",
-   "title": "Pull-Up Banners That Actually Get Read | Avanti Print",
-   "description": "Most pull-up banners are designed to be ignored. The two-second rule, the design mistakes that lose readers, and how to get a banner that earns its place.",
-   "og_image": null
-  },
-  {
-   "route": "/blog/custom-packaging-builds-your-brand",
-   "title": "Custom Packaging That Builds Your Brand | Avanti Print",
-   "description": "Packaging is the one moment a brand becomes physical. Why custom boxes and mailers turn deliveries into brand moments, and how small businesses can use them too.",
-   "og_image": null
-  },
-  {
-   "route": "/blog/eofy-sale-signage-that-works",
-   "title": "EOFY Sale Signage That Works | Avanti Print",
-   "description": "EOFY sales are won on the footpath. See which signage formats pull shoppers in, the message rules that work, and how next-day dispatch keeps you on time.",
-   "og_image": null
-  },
-  {
-   "route": "/blog/how-do-custom-pull-up-banners-transform-local-visibility-into-real-world-impact",
-   "title": "How Custom Pull Up Banners Boost Local Visibility & Brand Impact",
-   "description": "Discover how custom pull up banners increase local visibility, attract customers, and create lasting real-world brand impact for businesses and events.",
-   "og_image": null
-  },
-  {
-   "route": "/blog/why-are-custom-acm-panels-the-smartest-branding-move-for-modern-businesses",
+   "route": "/blog/10-customisable-gift-ideas",
    "title": null,
-   "description": "Boost your brand with custom ACM panels, durable, stylish, and cost-effective signage that enhances visibility and leaves a lasting impression.",
+   "description": "As an Australian based print and design service specialising in personalisation, we are your go-to business when it comes to customisable gifts.",
    "og_image": null
   },
   {
-   "route": "/blog/how-can-print-help-you-tell-a-brand-story-people-actually-remember",
-   "title": "How Can Print Help You Tell a Brand Story People Actually Remember?",
-   "description": "Discover how print marketing creates memorable brand stories that build trust, strengthen identity, and leave a lasting impression on customers.",
-   "og_image": null
-  },
-  {
-   "route": "/blog/why-are-personalised-cake-toppers-becoming-a-standout-trend-for-2026-celebrations",
+   "route": "/blog/12-reasons-to-use-cake-toppers-at-your-next-event",
    "title": null,
-   "description": "Discover why personalised cake toppers are trending in 2026 celebrations. Explore unique, custom designs that add a memorable touch to any event.",
+   "description": "Custom cake toppers can be made by print and design companies across Australia, allowing you to have a tailor-made design on your special day.",
    "og_image": null
   },
   {
-   "route": "/blog/custom-printing-on-shipping-cartons-how-can-packaging-elevate-the-unboxing-experience",
-   "title": "Custom Printing on Shipping Cartons: How Can Packaging Elevate the Unboxing Experience?",
-   "description": "Discover how custom printing on shipping cartons enhances branding, protection, and creates a memorable unboxing experience for customers.",
-   "og_image": null
-  },
-  {
-   "route": "/blog/how-do-custom-branded-mailer-boxes-elevate-premium-packaging-strategies",
+   "route": "/blog/17-wedding-decorations-youve-never-thought-of",
    "title": null,
-   "description": "Discover how custom branded mailer boxes enhance premium packaging strategies, improve brand recall, and create memorable unboxing experiences.",
+   "description": "Wedding, it’s the moment you’ve always dreamed of. Our event management experts give you 17 wedding decorations you’ve never thought of.",
    "og_image": null
   },
   {
-   "route": "/blog/how-to-install-peel-and-stick-wallpaper-easily-at-home",
+   "route": "/blog/5-creative-ways-to-use-cake-toppers-for-your-next-event",
    "title": null,
-   "description": "Learn easy steps to install peel-and-stick wallpaper at home, with tips for smooth application, perfect alignment, and lasting results.",
+   "description": "Cake toppers are versatile and can be used in various ways to add a unique touch to your cake.",
    "og_image": null
   },
   {
@@ -13350,39 +13358,57 @@
    "og_image": null
   },
   {
-   "route": "/blog/what-are-the-must-have-design-elements-for-pull-up-banners",
-   "title": "What Are the Must-Have Design Elements for Pull Up Banners?",
-   "description": "Discover the essential design elements for pull up banners that grab attention, boost brand visibility, and drive results at events and trade shows.",
-   "og_image": null
-  },
-  {
-   "route": "/blog/peel-and-stick-wallpaper-ideas-to-instantly-refresh-your-home",
-   "title": "Peel and Stick Wallpaper Ideas to Instantly Refresh Your Home",
-   "description": "Explore creative peel and stick wallpaper ideas to easily transform your home. Quick, stylish solutions for any room with minimal effort and maximum impact.",
-   "og_image": null
-  },
-  {
-   "route": "/blog/creative-cake-topper-ideas-for-special-moments",
+   "route": "/blog/5-things-to-know-before-you-purchase-sneeze-screens",
    "title": null,
-   "description": "Discover unique and creative cake topper ideas to add a personal touch to your special moments, from weddings to birthdays and everything in between.",
+   "description": "Quality COVID-19 screens are an essential item to prevent diseases from spreading. Purchase the most affordable sneeze screens from our online shop.",
    "og_image": null
   },
   {
-   "route": "/blog/what-makes-a-wedding-day-truly-memorable",
+   "route": "/blog/5-ways-to-make-your-house-a-home",
    "title": null,
-   "description": "Discover the key elements that make a wedding day unforgettable, from heartfelt moments to thoughtful details that create lasting memories for everyone.",
+   "description": "Have you just moved into a new place? How exciting!Moving into a new place is like having a blank canvas to create your own living space.",
    "og_image": null
   },
   {
-   "route": "/blog/how-to-design-the-perfect-wedding-invitation-with-avanti-print",
+   "route": "/blog/6-tips-for-designing-the-best-invitations",
    "title": null,
-   "description": "Discover expert tips on designing the perfect wedding invitation with Avanti Print. Create elegant, personalized invites that set the tone for your big day.",
+   "description": "What do weddings, birthdays, anniversaries, business functions and baptisms all have in common? They all require personalised invitations for the event!",
    "og_image": null
   },
   {
-   "route": "/blog/must-have-birthday-party-items-for-a-fun-filled-event",
+   "route": "/blog/6-unique-gifts-for-birthdays-weddings-and-event-hosts",
    "title": null,
-   "description": "Make your next celebration unforgettable with this checklist of must-have birthday party items for all ages.",
+   "description": "We can create a range of personalised unique gifts that are perfect for gifting at birthdays, weddings, anniversaries, and more.",
+   "og_image": null
+  },
+  {
+   "route": "/blog/7-reasons-to-get-sneeze-screens-for-your-business",
+   "title": null,
+   "description": "No matter whether you are running a café, supermarket, or any other business in Australia. Here are some reasons to get sneeze screens for your business.",
+   "og_image": null
+  },
+  {
+   "route": "/blog/8-creative-ideas-for-decorating-cakes-and-cupcakes",
+   "title": null,
+   "description": "Cakes are an important part of any celebration! Whether it’s a birthday, anniversary, wedding, Christmas party or something else, everyone at the event is bound to be expecting a cake.",
+   "og_image": null
+  },
+  {
+   "route": "/blog/9-wallpaper-trends-modern-homes",
+   "title": "What Are the Top 9 Wallpaper Trends for Modern Homes",
+   "description": "Explore the top 9 wallpaper trends transforming modern homes. From bold patterns to sleek finishes, find the perfect style to elevate your living space.",
+   "og_image": null
+  },
+  {
+   "route": "/blog/a-guide-to-modern-decorations-for-traditional-events",
+   "title": null,
+   "description": "It can be a challenge to find decorations, presents and event décor that match your modern tastes.",
+   "og_image": null
+  },
+  {
+   "route": "/blog/a-simple-guide-to-wedding-invitations",
+   "title": null,
+   "description": "Graphic design is a skill, and it also requires specific software programs that you may not have available to you. Therefore, many couples elect to have their wedding invite designed by a graphic designer, or to choose a pre-existing template that a graphic designer has made.",
    "og_image": null
   },
   {
@@ -13392,15 +13418,21 @@
    "og_image": null
   },
   {
-   "route": "/blog/personalised-valentines-day-gifts",
-   "title": "Personalised Valentine’s Day Gifts: Creative Print Ideas for Your Loved Ones",
-   "description": "Discover unique and creative personalized Valentine's Day gift ideas with custom prints that show your love in the most meaningful way.",
+   "route": "/blog/all-you-need-to-know-when-choosing-a-print-design",
+   "title": "All you need to know when choosing a print design",
+   "description": "Discover the art of print design for weddings! Explore stunning welcome signs, seating plans, and wedding invitations.",
    "og_image": null
   },
   {
-   "route": "/blog/choosing-perfect-wallpaper-office-environment",
+   "route": "/blog/best-decoration-ideas-for-a-kids-party",
    "title": null,
-   "description": "Discover tips for selecting the perfect wallpaper to enhance your office environment, boost productivity, and create a professional ambiance.",
+   "description": "Every parent wants their child to experience having an awesome birthday party – the challenge is creatively imagining new ideas that will put a smile on your child’s face! Many will agree that there’s no need to go overboard.",
+   "og_image": null
+  },
+  {
+   "route": "/blog/best-ways-personalize-wedding-invitations",
+   "title": "What Are the Best Ways to Personalise Wedding Invitations?",
+   "description": "Explore creative ways to personalize your wedding invitations, from custom designs to unique wording that reflects your style and story.",
    "og_image": null
   },
   {
@@ -13416,9 +13448,27 @@
    "og_image": null
   },
   {
-   "route": "/blog/best-ways-personalize-wedding-invitations",
-   "title": "What Are the Best Ways to Personalise Wedding Invitations?",
-   "description": "Explore creative ways to personalize your wedding invitations, from custom designs to unique wording that reflects your style and story.",
+   "route": "/blog/choosing-perfect-wallpaper-office-environment",
+   "title": null,
+   "description": "Discover tips for selecting the perfect wallpaper to enhance your office environment, boost productivity, and create a professional ambiance.",
+   "og_image": null
+  },
+  {
+   "route": "/blog/choosing-the-right-puzzles-for-winter",
+   "title": null,
+   "description": "How to pick the right puzzles for winter? We are big puzzlers ourselves here at Avanti Print so we thought to make the quick checklist.",
+   "og_image": null
+  },
+  {
+   "route": "/blog/cooking-in-style-personalised-kitchen-products",
+   "title": null,
+   "description": "In this article, Avanti Print will be exploring a few products that can bring the flair back into your kitchen, making mealtimes with family.",
+   "og_image": null
+  },
+  {
+   "route": "/blog/creative-cake-topper-ideas-for-special-moments",
+   "title": null,
+   "description": "Discover unique and creative cake topper ideas to add a personal touch to your special moments, from weddings to birthdays and everything in between.",
    "og_image": null
   },
   {
@@ -13428,21 +13478,33 @@
    "og_image": null
   },
   {
-   "route": "/blog/9-wallpaper-trends-modern-homes",
-   "title": "What Are the Top 9 Wallpaper Trends for Modern Homes",
-   "description": "Explore the top 9 wallpaper trends transforming modern homes. From bold patterns to sleek finishes, find the perfect style to elevate your living space.",
+   "route": "/blog/custom-acrylic-wreaths",
+   "title": null,
+   "description": "Custom acrylic wreaths are a highly popular option for decorating for events, decorating for special occasions, and decorating the home. So, why exactly are these products so popular, and why do you need one for your next event?",
    "og_image": null
   },
   {
-   "route": "/blog/trending-wedding-invitation-designs",
-   "title": "What Are the Latest Trends in Wedding Invitation Designs?",
-   "description": "Explore the latest trends in wedding invitation designs. Discover innovative styles and creative ideas to make your invites stand out in 2024.",
+   "route": "/blog/custom-packaging-builds-your-brand",
+   "title": "Custom Packaging That Builds Your Brand | Avanti Print",
+   "description": "Packaging is the one moment a brand becomes physical. Why custom boxes and mailers turn deliveries into brand moments, and how small businesses can use them too.",
    "og_image": null
   },
   {
-   "route": "/blog/photo-backdrops-essential-stunning-photos",
-   "title": "7 Reasons Photo Backdrops are Essential for Stunning Photos",
-   "description": "Uncover 7 reasons why photo backdrops are key to stunning photos. Elevate your photography with the perfect backdrop for a professional finish.",
+   "route": "/blog/custom-printing-on-shipping-cartons-how-can-packaging-elevate-the-unboxing-experience",
+   "title": "Custom Printing on Shipping Cartons: How Can Packaging Elevate the Unboxing Experience?",
+   "description": "Discover how custom printing on shipping cartons enhances branding, protection, and creates a memorable unboxing experience for customers.",
+   "og_image": null
+  },
+  {
+   "route": "/blog/decoration-ideas-for-religious-events-and-ceremonies",
+   "title": null,
+   "description": "For the number of Christian events that are held in Australia, including communions, baptisms or simply the birthday of a Christian friend or family member, there are surprisingly few ready-made decorations available to add Christian theming to your event.",
+   "og_image": null
+  },
+  {
+   "route": "/blog/decorations-checklist-for-your-wedding-day",
+   "title": null,
+   "description": "At Avanti Print, we specialise in a range of print products, many of which are suitable to be used as decorations during your wedding.",
    "og_image": null
   },
   {
@@ -13452,33 +13514,21 @@
    "og_image": null
   },
   {
-   "route": "/blog/how-custom-designs-evoke-emotional-resonance-with-consumers",
-   "title": "How Custom Designs Evoke Emotional Resonance with Consumer",
-   "description": "Discover the power of custom designs in forging emotional connections with consumers. Uncover the art of crafting lasting brand resonance.",
+   "route": "/blog/eofy-sale-signage-that-works",
+   "title": "EOFY Sale Signage That Works | Avanti Print",
+   "description": "EOFY sales are won on the footpath. See which signage formats pull shoppers in, the message rules that work, and how next-day dispatch keeps you on time.",
    "og_image": null
   },
   {
-   "route": "/blog/how-to-choose-the-perfect-cake-topper-for-your-wedding-theme",
-   "title": "How to Choose the Perfect Cake Topper for Your Wedding Theme",
-   "description": "Find the ideal cake topper to complement your wedding theme effortlessly. Expert tips for a memorable cake decoration.",
-   "og_image": null
-  },
-  {
-   "route": "/blog/top-9-wedding-invitation-card-designs-of-2024-a-comprehensive-guide",
-   "title": "Top 9 Wedding Invitation Card Designs of 2024",
-   "description": "Discover the trendiest wedding invitation designs of 2024. Elevate your wedding with these stylish and comprehensive card options",
-   "og_image": null
-  },
-  {
-   "route": "/blog/the-impact-of-colour-and-design-on-wedding-invitations",
+   "route": "/blog/every-excuse-you-need-to-buy-personalised-cupcake-toppers",
    "title": null,
-   "description": "Dive into the world of wedding invitations! Explore how color and design choices can transform your invites into cherished keepsakes.",
+   "description": "At Avanti Print, we are proud to create and sell modern cupcake toppers that can be 100% personalised to your desire. Shop Now!",
    "og_image": null
   },
   {
-   "route": "/blog/all-you-need-to-know-when-choosing-a-print-design",
-   "title": "All you need to know when choosing a print design",
-   "description": "Discover the art of print design for weddings! Explore stunning welcome signs, seating plans, and wedding invitations.",
+   "route": "/blog/everything-you-need-to-know-about-avanti-print",
+   "title": null,
+   "description": "Here at Avanti Print, we have a long list of customers who have been close to our business for many years. Our high quality products keep our customers coming back time and time again.",
    "og_image": null
   },
   {
@@ -13488,9 +13538,165 @@
    "og_image": null
   },
   {
-   "route": "/blog/the-rising-trend-of-modern-wedding-invitations",
+   "route": "/blog/five-decoration-ideas-for-a-communion-or-baptism",
    "title": null,
-   "description": "This blog post is a testament to the ever-evolving world of wedding invitations in Australia, reflecting our rich tapestry of traditions, innovations, and forward-thinking choices.",
+   "description": "As Australia’s leading provider of religious decorations, we've developed a list of five trendy decorations for both communions and baptisms.",
+   "og_image": null
+  },
+  {
+   "route": "/blog/five-tips-for-decorating-a-childs-birthday-party",
+   "title": null,
+   "description": "As leading party suppliers, we know exactly how to create a party aesthetic. To assist you, we've collected five top tips for choosing birthday party décor.",
+   "og_image": null
+  },
+  {
+   "route": "/blog/how-can-print-help-you-tell-a-brand-story-people-actually-remember",
+   "title": "How Can Print Help You Tell a Brand Story People Actually Remember?",
+   "description": "Discover how print marketing creates memorable brand stories that build trust, strengthen identity, and leave a lasting impression on customers.",
+   "og_image": null
+  },
+  {
+   "route": "/blog/how-custom-designs-evoke-emotional-resonance-with-consumers",
+   "title": "How Custom Designs Evoke Emotional Resonance with Consumer",
+   "description": "Discover the power of custom designs in forging emotional connections with consumers. Uncover the art of crafting lasting brand resonance.",
+   "og_image": null
+  },
+  {
+   "route": "/blog/how-do-acrylic-sneeze-guards-get-installed",
+   "title": null,
+   "description": "If you are yet to purchase acrylic sneeze guards for your business, it is highly recommended that you do so now rather than later.",
+   "og_image": null
+  },
+  {
+   "route": "/blog/how-do-custom-branded-mailer-boxes-elevate-premium-packaging-strategies",
+   "title": null,
+   "description": "Discover how custom branded mailer boxes enhance premium packaging strategies, improve brand recall, and create memorable unboxing experiences.",
+   "og_image": null
+  },
+  {
+   "route": "/blog/how-do-custom-pull-up-banners-transform-local-visibility-into-real-world-impact",
+   "title": "How Custom Pull Up Banners Boost Local Visibility & Brand Impact",
+   "description": "Discover how custom pull up banners increase local visibility, attract customers, and create lasting real-world brand impact for businesses and events.",
+   "og_image": null
+  },
+  {
+   "route": "/blog/how-to-choose-the-perfect-cake-topper-for-your-wedding-theme",
+   "title": "How to Choose the Perfect Cake Topper for Your Wedding Theme",
+   "description": "Find the ideal cake topper to complement your wedding theme effortlessly. Expert tips for a memorable cake decoration.",
+   "og_image": null
+  },
+  {
+   "route": "/blog/how-to-create-the-best-name-hoops",
+   "title": null,
+   "description": "Name hoops are fun and appealing decoration for special occasions. Here are some of our top tips for how to create the best name hoop.",
+   "og_image": null
+  },
+  {
+   "route": "/blog/how-to-decorate-a-cake-for-a-special-occasion",
+   "title": null,
+   "description": "If you’ve found your way here, you must have a special occasion coming up – how exciting! Whether it’s a birthday, a wedding, a baby shower, a bridal shower, an anniversary, or a celebration of another important moment in the lives of the people you love, you’re in the right.",
+   "og_image": null
+  },
+  {
+   "route": "/blog/how-to-design-the-best-looking-birthday-cake",
+   "title": null,
+   "description": "When it comes to birthday parties, everyone always looks forward to the cake! In many instances, the birthday cake can even steal the show from the birthday boy or girl themselves.",
+   "og_image": null
+  },
+  {
+   "route": "/blog/how-to-design-the-perfect-wedding-invitation-with-avanti-print",
+   "title": null,
+   "description": "Discover expert tips on designing the perfect wedding invitation with Avanti Print. Create elegant, personalized invites that set the tone for your big day.",
+   "og_image": null
+  },
+  {
+   "route": "/blog/how-to-find-the-perfect-cake-topper-for-you",
+   "title": null,
+   "description": "A cake topper is a small model that sits on top of a cake and helps to decorate your dessert or match the ongoing theme for your event.",
+   "og_image": null
+  },
+  {
+   "route": "/blog/how-to-install-peel-and-stick-wallpaper-easily-at-home",
+   "title": null,
+   "description": "Learn easy steps to install peel-and-stick wallpaper at home, with tips for smooth application, perfect alignment, and lasting results.",
+   "og_image": null
+  },
+  {
+   "route": "/blog/how-to-make-your-winter-event-as-stylish-as-possible",
+   "title": null,
+   "description": "Our team of print specialists and designers certainly do know a thing or two about party planning, we can help you plan your Winter events.",
+   "og_image": null
+  },
+  {
+   "route": "/blog/how-weddings-have-changed-in-australia",
+   "title": null,
+   "description": "The last few years during the COVID-19 pandemic have seen massive changes brought about to how Australians are holding their weddings.",
+   "og_image": null
+  },
+  {
+   "route": "/blog/most-popular-party-decoration-trend-in-2019",
+   "title": null,
+   "description": "The newest event decoration idea to take Australia by storm is metallic name hoops. If you are seeking party decoration trend, check it out!",
+   "og_image": null
+  },
+  {
+   "route": "/blog/must-have-birthday-party-items-for-a-fun-filled-event",
+   "title": null,
+   "description": "Make your next celebration unforgettable with this checklist of must-have birthday party items for all ages.",
+   "og_image": null
+  },
+  {
+   "route": "/blog/peel-and-stick-wallpaper-ideas-to-instantly-refresh-your-home",
+   "title": "Peel and Stick Wallpaper Ideas to Instantly Refresh Your Home",
+   "description": "Explore creative peel and stick wallpaper ideas to easily transform your home. Quick, stylish solutions for any room with minimal effort and maximum impact.",
+   "og_image": null
+  },
+  {
+   "route": "/blog/personalise-the-interior-of-your-home-in-2020",
+   "title": null,
+   "description": "To fully feel that your house is yours, you need to personalise like there’s no tomorrow. We have some kinds of personalised interiors.",
+   "og_image": null
+  },
+  {
+   "route": "/blog/personalised-valentines-day-gifts",
+   "title": "Personalised Valentine’s Day Gifts: Creative Print Ideas for Your Loved Ones",
+   "description": "Discover unique and creative personalized Valentine's Day gift ideas with custom prints that show your love in the most meaningful way.",
+   "og_image": null
+  },
+  {
+   "route": "/blog/photo-backdrops-essential-stunning-photos",
+   "title": "7 Reasons Photo Backdrops are Essential for Stunning Photos",
+   "description": "Uncover 7 reasons why photo backdrops are key to stunning photos. Elevate your photography with the perfect backdrop for a professional finish.",
+   "og_image": null
+  },
+  {
+   "route": "/blog/protecting-your-business-against-covid-19",
+   "title": null,
+   "description": "The recent COVID-19 pandemic has demonstrated the importance of health & hygiene throughout Australia & the world. Here is how to protect your business",
+   "og_image": null
+  },
+  {
+   "route": "/blog/pull-up-banners-that-get-read",
+   "title": "Pull-Up Banners That Actually Get Read | Avanti Print",
+   "description": "Most pull-up banners are designed to be ignored. The two-second rule, the design mistakes that lose readers, and how to get a banner that earns its place.",
+   "og_image": null
+  },
+  {
+   "route": "/blog/spoiling-your-loved-ones-on-their-birthday",
+   "title": null,
+   "description": "Birthdays only come around once a year. For those who are inclined to special occasions, a friend or family member’s birthday is a unique opportunity to show your appreciation and make sure that those who you care for have the best day possible.",
+   "og_image": null
+  },
+  {
+   "route": "/blog/the-best-social-distancing-decals-for-your-business",
+   "title": null,
+   "description": "Having informative social distancing decals in your workplace will assist staff & customers to understand the specific regulations retaining your business.",
+   "og_image": null
+  },
+  {
+   "route": "/blog/the-impact-of-colour-and-design-on-wedding-invitations",
+   "title": null,
+   "description": "Dive into the world of wedding invitations! Explore how color and design choices can transform your invites into cherished keepsakes.",
    "og_image": null
   },
   {
@@ -13512,15 +13718,9 @@
    "og_image": null
   },
   {
-   "route": "/blog/5-creative-ways-to-use-cake-toppers-for-your-next-event",
+   "route": "/blog/the-rising-trend-of-modern-wedding-invitations",
    "title": null,
-   "description": "Cake toppers are versatile and can be used in various ways to add a unique touch to your cake.",
-   "og_image": null
-  },
-  {
-   "route": "/blog/where-to-get-the-best-custom-cake-toppers-in-australia",
-   "title": null,
-   "description": "We specialise in custom cake toppers and personalised cake toppers Australia, so we can deliver the goods for your special occasion.",
+   "description": "This blog post is a testament to the ever-evolving world of wedding invitations in Australia, reflecting our rich tapestry of traditions, innovations, and forward-thinking choices.",
    "og_image": null
   },
   {
@@ -13530,201 +13730,21 @@
    "og_image": null
   },
   {
-   "route": "/blog/where-to-buy-a-personalised-serving-board",
-   "title": null,
-   "description": "Are you looking for the best online store to buy a personalised serving board as a present? Here at Avanti Print, our Australian online custom design and print store can produce timber serving boards in various shapes and sizes that are engraved with a personalised message.",
+   "route": "/blog/top-9-wedding-invitation-card-designs-of-2024-a-comprehensive-guide",
+   "title": "Top 9 Wedding Invitation Card Designs of 2024",
+   "description": "Discover the trendiest wedding invitation designs of 2024. Elevate your wedding with these stylish and comprehensive card options",
    "og_image": null
   },
   {
-   "route": "/blog/custom-acrylic-wreaths",
+   "route": "/blog/top-five-wedding-decoration-ideas-in-2019",
    "title": null,
-   "description": "Custom acrylic wreaths are a highly popular option for decorating for events, decorating for special occasions, and decorating the home. So, why exactly are these products so popular, and why do you need one for your next event?",
+   "description": "Of all the looming wedding crazes, six distinctive décor items have been most successful at winding their way into weddings across Australia.",
    "og_image": null
   },
   {
-   "route": "/blog/how-to-design-the-best-looking-birthday-cake",
-   "title": null,
-   "description": "When it comes to birthday parties, everyone always looks forward to the cake! In many instances, the birthday cake can even steal the show from the birthday boy or girl themselves.",
-   "og_image": null
-  },
-  {
-   "route": "/blog/decoration-ideas-for-religious-events-and-ceremonies",
-   "title": null,
-   "description": "For the number of Christian events that are held in Australia, including communions, baptisms or simply the birthday of a Christian friend or family member, there are surprisingly few ready-made decorations available to add Christian theming to your event.",
-   "og_image": null
-  },
-  {
-   "route": "/blog/a-simple-guide-to-wedding-invitations",
-   "title": null,
-   "description": "Graphic design is a skill, and it also requires specific software programs that you may not have available to you. Therefore, many couples elect to have their wedding invite designed by a graphic designer, or to choose a pre-existing template that a graphic designer has made.",
-   "og_image": null
-  },
-  {
-   "route": "/blog/spoiling-your-loved-ones-on-their-birthday",
-   "title": null,
-   "description": "Birthdays only come around once a year. For those who are inclined to special occasions, a friend or family member’s birthday is a unique opportunity to show your appreciation and make sure that those who you care for have the best day possible.",
-   "og_image": null
-  },
-  {
-   "route": "/blog/best-decoration-ideas-for-a-kids-party",
-   "title": null,
-   "description": "Every parent wants their child to experience having an awesome birthday party – the challenge is creatively imagining new ideas that will put a smile on your child’s face! Many will agree that there’s no need to go overboard.",
-   "og_image": null
-  },
-  {
-   "route": "/blog/where-to-find-the-best-custom-sneeze-guard-australia",
-   "title": null,
-   "description": "Custom sneeze guards are more important than ever before! It’s essential to have your workplace fitted out in a way that protects your staff and visitors, and ensures you’re prepared for anything.",
-   "og_image": null
-  },
-  {
-   "route": "/blog/how-to-decorate-a-cake-for-a-special-occasion",
-   "title": null,
-   "description": "If you’ve found your way here, you must have a special occasion coming up – how exciting! Whether it’s a birthday, a wedding, a baby shower, a bridal shower, an anniversary, or a celebration of another important moment in the lives of the people you love, you’re in the right.",
-   "og_image": null
-  },
-  {
-   "route": "/blog/5-ways-to-make-your-house-a-home",
-   "title": null,
-   "description": "Have you just moved into a new place? How exciting!Moving into a new place is like having a blank canvas to create your own living space.",
-   "og_image": null
-  },
-  {
-   "route": "/blog/10-customisable-gift-ideas",
-   "title": null,
-   "description": "As an Australian based print and design service specialising in personalisation, we are your go-to business when it comes to customisable gifts.",
-   "og_image": null
-  },
-  {
-   "route": "/blog/everything-you-need-to-know-about-avanti-print",
-   "title": null,
-   "description": "Here at Avanti Print, we have a long list of customers who have been close to our business for many years. Our high quality products keep our customers coming back time and time again.",
-   "og_image": null
-  },
-  {
-   "route": "/blog/8-creative-ideas-for-decorating-cakes-and-cupcakes",
-   "title": null,
-   "description": "Cakes are an important part of any celebration! Whether it’s a birthday, anniversary, wedding, Christmas party or something else, everyone at the event is bound to be expecting a cake.",
-   "og_image": null
-  },
-  {
-   "route": "/blog/a-guide-to-modern-decorations-for-traditional-events",
-   "title": null,
-   "description": "It can be a challenge to find decorations, presents and event décor that match your modern tastes.",
-   "og_image": null
-  },
-  {
-   "route": "/blog/how-weddings-have-changed-in-australia",
-   "title": null,
-   "description": "The last few years during the COVID-19 pandemic have seen massive changes brought about to how Australians are holding their weddings.",
-   "og_image": null
-  },
-  {
-   "route": "/blog/cooking-in-style-personalised-kitchen-products",
-   "title": null,
-   "description": "In this article, Avanti Print will be exploring a few products that can bring the flair back into your kitchen, making mealtimes with family.",
-   "og_image": null
-  },
-  {
-   "route": "/blog/decorations-checklist-for-your-wedding-day",
-   "title": null,
-   "description": "At Avanti Print, we specialise in a range of print products, many of which are suitable to be used as decorations during your wedding.",
-   "og_image": null
-  },
-  {
-   "route": "/blog/choosing-the-right-puzzles-for-winter",
-   "title": null,
-   "description": "How to pick the right puzzles for winter? We are big puzzlers ourselves here at Avanti Print so we thought to make the quick checklist.",
-   "og_image": null
-  },
-  {
-   "route": "/blog/how-to-create-the-best-name-hoops",
-   "title": null,
-   "description": "Name hoops are fun and appealing decoration for special occasions. Here are some of our top tips for how to create the best name hoop.",
-   "og_image": null
-  },
-  {
-   "route": "/blog/how-to-make-your-winter-event-as-stylish-as-possible",
-   "title": null,
-   "description": "Our team of print specialists and designers certainly do know a thing or two about party planning, we can help you plan your Winter events.",
-   "og_image": null
-  },
-  {
-   "route": "/blog/12-reasons-to-use-cake-toppers-at-your-next-event",
-   "title": null,
-   "description": "Custom cake toppers can be made by print and design companies across Australia, allowing you to have a tailor-made design on your special day.",
-   "og_image": null
-  },
-  {
-   "route": "/blog/6-unique-gifts-for-birthdays-weddings-and-event-hosts",
-   "title": null,
-   "description": "We can create a range of personalised unique gifts that are perfect for gifting at birthdays, weddings, anniversaries, and more.",
-   "og_image": null
-  },
-  {
-   "route": "/blog/how-to-find-the-perfect-cake-topper-for-you",
-   "title": null,
-   "description": "A cake topper is a small model that sits on top of a cake and helps to decorate your dessert or match the ongoing theme for your event.",
-   "og_image": null
-  },
-  {
-   "route": "/blog/every-excuse-you-need-to-buy-personalised-cupcake-toppers",
-   "title": null,
-   "description": "At Avanti Print, we are proud to create and sell modern cupcake toppers that can be 100% personalised to your desire. Shop Now!",
-   "og_image": null
-  },
-  {
-   "route": "/blog/17-wedding-decorations-youve-never-thought-of",
-   "title": null,
-   "description": "Wedding, it’s the moment you’ve always dreamed of. Our event management experts give you 17 wedding decorations you’ve never thought of.",
-   "og_image": null
-  },
-  {
-   "route": "/blog/what-are-the-biggest-event-trends-for-2021",
-   "title": null,
-   "description": "Thankfully, in Australia, most states and territories have managed to keep the spread of COVID-19 under control. So people can host small parties & events.",
-   "og_image": null
-  },
-  {
-   "route": "/blog/6-tips-for-designing-the-best-invitations",
-   "title": null,
-   "description": "What do weddings, birthdays, anniversaries, business functions and baptisms all have in common? They all require personalised invitations for the event!",
-   "og_image": null
-  },
-  {
-   "route": "/blog/5-things-to-know-before-you-purchase-sneeze-screens",
-   "title": null,
-   "description": "Quality COVID-19 screens are an essential item to prevent diseases from spreading. Purchase the most affordable sneeze screens from our online shop.",
-   "og_image": null
-  },
-  {
-   "route": "/blog/what-are-the-best-decoration-ideas-for-events-in-2020",
-   "title": null,
-   "description": "As leaders in print and design, Avanti Print has a number of customisable event decoration and ideas available on our website.",
-   "og_image": null
-  },
-  {
-   "route": "/blog/the-best-social-distancing-decals-for-your-business",
-   "title": null,
-   "description": "Having informative social distancing decals in your workplace will assist staff & customers to understand the specific regulations retaining your business.",
-   "og_image": null
-  },
-  {
-   "route": "/blog/protecting-your-business-against-covid-19",
-   "title": null,
-   "description": "The recent COVID-19 pandemic has demonstrated the importance of health & hygiene throughout Australia & the world. Here is how to protect your business",
-   "og_image": null
-  },
-  {
-   "route": "/blog/how-do-acrylic-sneeze-guards-get-installed",
-   "title": null,
-   "description": "If you are yet to purchase acrylic sneeze guards for your business, it is highly recommended that you do so now rather than later.",
-   "og_image": null
-  },
-  {
-   "route": "/blog/7-reasons-to-get-sneeze-screens-for-your-business",
-   "title": null,
-   "description": "No matter whether you are running a café, supermarket, or any other business in Australia. Here are some reasons to get sneeze screens for your business.",
+   "route": "/blog/trending-wedding-invitation-designs",
+   "title": "What Are the Latest Trends in Wedding Invitation Designs?",
+   "description": "Explore the latest trends in wedding invitation designs. Discover innovative styles and creative ideas to make your invites stand out in 2024.",
    "og_image": null
   },
   {
@@ -13734,15 +13754,39 @@
    "og_image": null
   },
   {
-   "route": "/blog/personalise-the-interior-of-your-home-in-2020",
+   "route": "/blog/what-are-the-best-decoration-ideas-for-events-in-2020",
    "title": null,
-   "description": "To fully feel that your house is yours, you need to personalise like there’s no tomorrow. We have some kinds of personalised interiors.",
+   "description": "As leaders in print and design, Avanti Print has a number of customisable event decoration and ideas available on our website.",
+   "og_image": null
+  },
+  {
+   "route": "/blog/what-are-the-best-modern-cake-toppers-in-australia",
+   "title": null,
+   "description": "The best cake toppers stores in Australia offer the ability to customise their products so they can perfectly match any event.",
+   "og_image": null
+  },
+  {
+   "route": "/blog/what-are-the-biggest-event-trends-for-2021",
+   "title": null,
+   "description": "Thankfully, in Australia, most states and territories have managed to keep the spread of COVID-19 under control. So people can host small parties & events.",
+   "og_image": null
+  },
+  {
+   "route": "/blog/what-are-the-must-have-design-elements-for-pull-up-banners",
+   "title": "What Are the Must-Have Design Elements for Pull Up Banners?",
+   "description": "Discover the essential design elements for pull up banners that grab attention, boost brand visibility, and drive results at events and trade shows.",
    "og_image": null
   },
   {
    "route": "/blog/what-decorations-are-needed-for-a-wedding",
    "title": null,
    "description": "The Avanti Print team not only provides wholesale wedding decorations, but also individual orders for clients. Contact us today!",
+   "og_image": null
+  },
+  {
+   "route": "/blog/what-makes-a-wedding-day-truly-memorable",
+   "title": null,
+   "description": "Discover the key elements that make a wedding day unforgettable, from heartfelt moments to thoughtful details that create lasting memories for everyone.",
    "og_image": null
   },
   {
@@ -13758,39 +13802,39 @@
    "og_image": null
   },
   {
-   "route": "/blog/five-tips-for-decorating-a-childs-birthday-party",
+   "route": "/blog/where-to-buy-a-personalised-serving-board",
    "title": null,
-   "description": "As leading party suppliers, we know exactly how to create a party aesthetic. To assist you, we've collected five top tips for choosing birthday party décor.",
-   "og_image": null
-  },
-  {
-   "route": "/blog/five-decoration-ideas-for-a-communion-or-baptism",
-   "title": null,
-   "description": "As Australia’s leading provider of religious decorations, we've developed a list of five trendy decorations for both communions and baptisms.",
-   "og_image": null
-  },
-  {
-   "route": "/blog/what-are-the-best-modern-cake-toppers-in-australia",
-   "title": null,
-   "description": "The best cake toppers stores in Australia offer the ability to customise their products so they can perfectly match any event.",
-   "og_image": null
-  },
-  {
-   "route": "/blog/top-five-wedding-decoration-ideas-in-2019",
-   "title": null,
-   "description": "Of all the looming wedding crazes, six distinctive décor items have been most successful at winding their way into weddings across Australia.",
-   "og_image": null
-  },
-  {
-   "route": "/blog/most-popular-party-decoration-trend-in-2019",
-   "title": null,
-   "description": "The newest event decoration idea to take Australia by storm is metallic name hoops. If you are seeking party decoration trend, check it out!",
+   "description": "Are you looking for the best online store to buy a personalised serving board as a present? Here at Avanti Print, our Australian online custom design and print store can produce timber serving boards in various shapes and sizes that are engraved with a personalised message.",
    "og_image": null
   },
   {
    "route": "/blog/where-to-find-a-personalised-cake-topper-in-australia",
    "title": "Where to find a personalised cake toppers in Australia | Avanti Print & Design",
    "description": "To find the best quality personalised cake toppers in Sydney or Australia, you need to look at the Avanti Print and Design.",
+   "og_image": null
+  },
+  {
+   "route": "/blog/where-to-find-the-best-custom-sneeze-guard-australia",
+   "title": null,
+   "description": "Custom sneeze guards are more important than ever before! It’s essential to have your workplace fitted out in a way that protects your staff and visitors, and ensures you’re prepared for anything.",
+   "og_image": null
+  },
+  {
+   "route": "/blog/where-to-get-the-best-custom-cake-toppers-in-australia",
+   "title": null,
+   "description": "We specialise in custom cake toppers and personalised cake toppers Australia, so we can deliver the goods for your special occasion.",
+   "og_image": null
+  },
+  {
+   "route": "/blog/why-are-custom-acm-panels-the-smartest-branding-move-for-modern-businesses",
+   "title": null,
+   "description": "Boost your brand with custom ACM panels, durable, stylish, and cost-effective signage that enhances visibility and leaves a lasting impression.",
+   "og_image": null
+  },
+  {
+   "route": "/blog/why-are-personalised-cake-toppers-becoming-a-standout-trend-for-2026-celebrations",
+   "title": null,
+   "description": "Discover why personalised cake toppers are trending in 2026 celebrations. Explore unique, custom designs that add a memorable touch to any event.",
    "og_image": null
   },
   {

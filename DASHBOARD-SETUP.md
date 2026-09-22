@@ -8,6 +8,14 @@ blog posts. Saved changes are live on the next page load, with no redeploy.
 Until the steps below are done, the site runs exactly as before on the data built into
 `index.html`, and the login page says it isn't connected yet.
 
+## Trying it first (demo mode)
+
+Before any of the setup below, the dashboard can be tried at `/#/login` with username
+`teamGYA` and password `avantisite2026`. Everything works, but changes are saved only in the
+browser you're using: nobody else sees them and nothing goes live. **Reset demo** in the
+sidebar puts everything back. Anyone can read the demo login in the page code, so before the
+site goes live set `demo: false` in the config block. Step 5 below also switches it off.
+
 Setup takes about 15 minutes.
 
 ## 1. Create the Supabase project

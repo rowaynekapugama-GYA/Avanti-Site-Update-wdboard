@@ -1,6 +1,34 @@
 # Avanti Print & Design, new storefront (v1)
 
-## Changelog: blog moved across with its SEO (this round)
+## Changelog: banner templates and template dropdown (this round)
+
+- All four pull up banner stands now list the live site's two artwork templates (1400 × 850 mm
+  and 2200 × 850 mm) in the template box beside Add to cart. They used to appear only in the
+  artwork preview panel further down the page; that duplicate has been removed.
+- Every product's templates now sit in a "Download Artwork Template" dropdown, like the live
+  site, instead of a block of links. It starts closed; choosing a size opens it on that size's
+  PDFs, with "Show all sizes" to see the rest. Long lists (40 mailer box templates) scroll
+  inside the dropdown.
+- Fixed: in demo or database mode, blog posts lost their Google title and description on the
+  post list, so a seed export ("Download seed data") left out all 87 post SEO entries, and
+  SEO edited for products and pages. Posts now keep their SEO in every mode, and the export
+  includes every SEO entry. `scripts/seed-data.json` regenerated.
+- Tests: 23 template checks, 29 demo, 36 dashboard, 48 blog, and all seven storefront suites. All pass.
+
+## Changelog: demo sign-in
+
+- The dashboard can now be tried before Supabase is set up. Go to `/#/login` and sign in with
+  username `teamGYA`, password `avantisite2026`.
+- In demo mode the dashboard works fully (prices, products, blog, SEO, wording, shipping, image
+  uploads) but saves only in that person's own browser. Nobody else sees the changes and nothing
+  goes live. The shop in that same browser shows the edits, so you can check them. **Reset demo**
+  in the dashboard sidebar puts everything back.
+- The demo password is visible to anyone who reads the page code. That's fine for a demo, as it only
+  unlocks a private copy in their own browser, but set `demo: false` in the config block before
+  go-live. Filling in the Supabase URL and key also switches the demo off automatically.
+- Tests: 27 demo checks, plus the blog (48), dashboard (36) and all seven storefront suites. All pass.
+
+## Changelog: blog moved across with its SEO
 
 - All 87 of Avanti's blog posts (July 2019 to August 2026) now live on this site in full, imported
   from the WordPress export of 22 Sep 2026. Blog page: newest first, 12 per page with page numbers;

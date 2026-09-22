@@ -10,8 +10,293 @@
   supabaseUrl: '',          // e.g. https://abcdefghijkl.supabase.co
   anonKey: '',              // the "anon public" key
   site: 'avanti',
-  brand: 'Avanti Print & Design'
+  brand: 'Avanti Print & Design',
+  // DEMO: lets people try the dashboard before Supabase is set up. Edits are saved in the
+  // viewer's own browser only and nobody else sees them. Anyone who reads this file can see
+  // this login, which is fine for a demo but means demo must be set to false before go-live.
+  // Filling in supabaseUrl above switches the demo off automatically.
+  demo: true,
+  demoUser: 'teamGYA',
+  demoPassword: 'avantisite2026'
 };</script>
+<script>
+/* ==== GYA CMS demo backend ====================================================
+   Lets people try the staff dashboard before a Supabase project exists. It answers
+   the dashboard's database, login and file requests from this browser's own storage,
+   seeded from the data built into this page, so edits show on the site in the same
+   browser only. Nothing is sent anywhere and other visitors never see the changes.
+   On when the config has demo: true and no supabaseUrl. Filling in supabaseUrl and
+   anonKey switches it off automatically. Set demo: false before the site goes live. */
+(function () {
+  const cfg = window.GYA_CMS_CONFIG || {};
+  if (!cfg.demo || cfg.supabaseUrl) return;
+  const BASE = 'https://demo.gya.invalid', DB_KEY = 'gya-demo-db-v1', FILE_KEY = 'gya-demo-file:', TOKEN = 'demo.';
+  cfg.supabaseUrl = BASE; cfg.anonKey = 'demo';
+  const USER = String(cfg.demoUser || 'teamGYA'), PASS = String(cfg.demoPassword || '');
+  const UID = '00000000-0000-4000-8000-000000000001';
+
+  // column defaults per table, from supabase-schema.sql
+  const now = () => new Date().toISOString();
+  const TABLES = {
+    shipping_classes: { key: 'slug', d: { label: null, courier: false, note: null, position: 0 }, stamp: true },
+    shipping_rates: { id: true, d: { position: 0 }, parent: ['shipping_classes', 'class_slug'] },
+    categories: { key: 'slug', d: { group_name: null, blurb: null, image_url: null, shipping_class: null, position: 0, published: true }, stamp: true, visible: 'published' },
+    products: { key: 'slug', d: { summary: null, description_html: null, pricing_mode: 'fixed', base_price: 0, price_max: null, unit_label: null, wall_dims: false,
+      dims_config: null, variation_keys: null, tags: null, sold_out: false, has_personalisation: false, personalisation: null, swatches: null, preview_text: null,
+      position: 0, published: true }, stamp: true, visible: 'published' },
+    product_options: { id: true, d: { choices: [], position: 0 }, parent: ['products', 'product_slug'] },
+    product_variations: { id: true, d: { available: true, position: 0 }, parent: ['products', 'product_slug'] },
+    product_price_tiers: { id: true, d: {}, parent: ['products', 'product_slug'] },
+    product_images: { id: true, d: { fallback_url: null, alt: null, position: 0 }, parent: ['products', 'product_slug'] },
+    product_templates: { id: true, d: { size_key: null, position: 0 }, parent: ['products', 'product_slug'] },
+    blog_posts: { key: 'slug', d: { excerpt: null, body_html: null, cover_url: null, legacy_url: null, published_at: null, published: true }, stamp: true, visible: 'published' },
+    pages: { key: 'slug', d: { body_html: null, published: true }, stamp: true, visible: 'published' },
+    faqs: { id: true, d: { position: 0 } },
+    seo_entries: { key: 'route', d: { title: null, description: null, og_image: null }, stamp: true },
+    site_settings: { key: 'key', d: { value: null }, stamp: true },
+    media: { id: true, d: {}, adminOnly: true },
+    profiles: { key: 'user_id', d: {} },
+  };
+  const MONEY = new Set(['base_price', 'price_max', 'price', 'unit_price', 'amount']);
+  const clone = x => JSON.parse(JSON.stringify(x));
+  const money = r => { for (const k of MONEY) if (r[k] != null && r[k] !== '') r[k] = Math.round(Number(r[k]) * 100) / 100; return r; };
+
+  let db = null;
+  function persist() {
+    try { localStorage.setItem(DB_KEY, JSON.stringify(db)); }
+    catch (e) { throw httpError(507, 'This browser is out of demo storage. Use "Reset demo" in the dashboard, or upload smaller images.'); }
+  }
+  function load() {
+    if (db) return db;
+    try { db = JSON.parse(localStorage.getItem(DB_KEY) || 'null'); } catch (e) { db = null; }
+    if (db && db.v === 1) return db;
+    db = { v: 1, seq: 1, t: {} };
+    Object.keys(TABLES).forEach(k => db.t[k] = []);
+    const seed = typeof GYA !== 'undefined' && GYA.adapter && GYA.adapter.toSeed && GYA.adapter.toSeed();   // GYA is a top-level const, not on window
+    if (seed) {
+      saveShipping(seed.shipping || { classes: [] });
+      upsertRows('categories', (seed.categories || []).map(c => Object.assign({}, c, { shipping_class: undefined })), 'slug', true);
+      // shipping sets category links, so run it again now the categories exist
+      saveShipping(seed.shipping || { classes: [] });
+      (seed.products || []).forEach(p => saveProduct(p));
+      upsertRows('blog_posts', seed.blog_posts || [], 'slug');
+      upsertRows('pages', seed.pages || [], 'slug');
+      Object.entries(seed.faqs || {}).forEach(([k, items]) => saveFaqs(k, items));
+      upsertRows('site_settings', seed.site_settings || [], 'key');
+      upsertRows('seo_entries', seed.seo_entries || [], 'route');
+    }
+    db.t.profiles = [{ user_id: UID, role: 'admin', display_name: 'Team GYA' }];
+    persist();
+    return db;
+  }
+
+  function httpError(status, message) { const e = new Error(message); e.status = status; return e; }
+  function withDefaults(table, row) {
+    const T = TABLES[table], r = Object.assign({}, clone(T.d), row);
+    Object.keys(r).forEach(k => r[k] === undefined && delete r[k]);
+    if (T.id && r.id == null) r.id = db.seq++;
+    if (T.stamp) r.updated_at = now();
+    return money(r);
+  }
+  function upsertRows(table, rows, key, keepMissing) {
+    const list = db.t[table], out = [];
+    (Array.isArray(rows) ? rows : [rows]).forEach(row => {
+      const i = key ? list.findIndex(x => x[key] === row[key]) : -1;
+      if (i >= 0) { const r = money(Object.assign(list[i], clone(row))); Object.keys(r).forEach(k => r[k] === undefined && delete r[k]);
+        if (TABLES[table].stamp) r.updated_at = now(); out.push(r); }
+      else { const r = withDefaults(table, clone(row)); list.push(r); out.push(r); }
+    });
+    return out;
+  }
+  function removeWhere(table, test) {
+    const gone = db.t[table].filter(test); db.t[table] = db.t[table].filter(r => !test(r));
+    // cascades, as in the real schema
+    gone.forEach(r => Object.entries(TABLES).forEach(([t, T]) => {
+      if (T.parent && T.parent[0] === table) removeWhere(t, x => x[T.parent[1]] === r[TABLES[table].key]);
+    }));
+    if (table === 'shipping_classes') gone.forEach(r => db.t.categories.forEach(c => { if (c.shipping_class === r.slug) c.shipping_class = null; }));
+    return gone;
+  }
+
+  // ---- the three save routines, mirroring supabase-schema.sql
+  function saveProduct(p) {
+    const s = p.slug, old = p.original_slug || s;
+    if (!s || !/^[a-z0-9]+(-[a-z0-9]+)*$/.test(s)) throw httpError(400, `Invalid slug: ${s}`);
+    if (old !== s) { const o = db.t.products.find(x => x.slug === old);
+      if (o) { o.slug = s; Object.entries(TABLES).forEach(([t, T]) => { if (T.parent && T.parent[0] === 'products') db.t[t].forEach(r => { if (r.product_slug === old) r.product_slug = s; }); }); } }
+    const cols = ['name', 'category_slug', 'summary', 'description_html', 'pricing_mode', 'base_price', 'price_max', 'unit_label', 'wall_dims', 'dims_config',
+      'variation_keys', 'tags', 'sold_out', 'has_personalisation', 'personalisation', 'swatches', 'preview_text', 'position', 'published'];
+    const row = { slug: s }; cols.forEach(c => { row[c] = p[c] === undefined ? null : p[c]; });
+    const D = TABLES.products.d; ['pricing_mode', 'base_price', 'wall_dims', 'sold_out', 'has_personalisation', 'position', 'published'].forEach(c => { if (row[c] == null) row[c] = D[c]; });
+    const i = db.t.products.findIndex(x => x.slug === s);
+    if (i >= 0) db.t.products[i] = withDefaults('products', row); else db.t.products.push(withDefaults('products', row));
+    ['product_options', 'product_variations', 'product_price_tiers', 'product_images', 'product_templates'].forEach(t => { db.t[t] = db.t[t].filter(r => r.product_slug !== s); });
+    (p.options || []).forEach((o, k) => db.t.product_options.push(withDefaults('product_options', { product_slug: s, name: o.name, choices: o.choices || [], position: k })));
+    (p.variations || []).forEach((v, k) => db.t.product_variations.push(withDefaults('product_variations', { product_slug: s, option_values: v.option_values, price: Number(v.price), available: v.available == null ? true : !!v.available, position: k })));
+    (p.tiers || []).forEach(x => db.t.product_price_tiers.push(withDefaults('product_price_tiers', { product_slug: s, min_qty: parseInt(x.min_qty, 10), unit_price: Number(x.unit_price) })));
+    (p.images || []).forEach((m, k) => db.t.product_images.push(withDefaults('product_images', { product_slug: s, url: m.url, fallback_url: m.fallback_url == null ? null : m.fallback_url, alt: m.alt == null ? null : m.alt, position: k })));
+    (p.templates || []).forEach((x, k) => db.t.product_templates.push(withDefaults('product_templates', { product_slug: s, label: x.label, url: x.url, size_key: x.size_key == null ? null : x.size_key, position: k })));
+    const prices = db.t.product_variations.filter(v => v.product_slug === s && v.available).map(v => v.price);
+    const pr = db.t.products.find(x => x.slug === s);
+    if (db.t.product_variations.some(v => v.product_slug === s)) { if (prices.length) pr.base_price = Math.min(...prices); pr.price_max = prices.length ? Math.max(...prices) : null; }
+    return clone(pr);
+  }
+  function saveShipping(payload) {
+    const classes = (payload && payload.classes) || [];
+    db.t.categories.forEach(c => { c.shipping_class = null; });
+    const keep = new Set(classes.map(c => c.slug));
+    db.t.shipping_classes = db.t.shipping_classes.filter(c => keep.has(c.slug));
+    db.t.shipping_rates = db.t.shipping_rates.filter(r => keep.has(r.class_slug));
+    classes.forEach((c, i) => {
+      upsertRows('shipping_classes', [{ slug: c.slug, label: c.label, courier: !!c.courier, note: c.note == null ? null : c.note, position: i }], 'slug');
+      db.t.shipping_rates = db.t.shipping_rates.filter(r => r.class_slug !== c.slug);
+      (c.rates || []).forEach((r, j) => db.t.shipping_rates.push(withDefaults('shipping_rates', { class_slug: c.slug, label: r.label, amount: Number(r.amount), position: j })));
+      (c.categories || []).forEach(s => { const cat = db.t.categories.find(x => x.slug === s); if (cat) cat.shipping_class = c.slug; });
+    });
+    return null;
+  }
+  function saveFaqs(key, items) {
+    db.t.faqs = db.t.faqs.filter(f => f.set_key !== key);
+    (items || []).forEach((q, i) => db.t.faqs.push(withDefaults('faqs', { set_key: key, question: q.question, answer: q.answer, position: i })));
+    return null;
+  }
+
+  // ---- a small PostgREST: select, eq/is/in filters, order, limit, offset
+  function parseValue(op, v) {
+    if (op === 'is') return v === 'true' ? true : v === 'false' ? false : null;
+    return decodeURIComponent(v);
+  }
+  function query(table, params, admin) {
+    let rows = db.t[table].slice();
+    const T = TABLES[table];
+    if (!admin) {
+      if (T.adminOnly) rows = [];
+      if (T.visible) rows = rows.filter(r => r[T.visible]);
+      if (T.parent && T.parent[0] === 'products') { const ok = new Set(db.t.products.filter(p => p.published).map(p => p.slug)); rows = rows.filter(r => ok.has(r.product_slug)); }
+    }
+    for (const [k, raw] of params) {
+      if (['select', 'order', 'limit', 'offset', 'on_conflict'].includes(k)) continue;
+      const m = raw.match(/^(eq|neq|is|in)\.(.*)$/); if (!m) continue;
+      const [, op, val] = m;
+      if (op === 'in') { const set = val.replace(/^\(|\)$/g, '').split(',').map(decodeURIComponent); rows = rows.filter(r => set.includes(String(r[k]))); }
+      else { const v = parseValue(op, val); rows = rows.filter(r => op === 'neq' ? String(r[k]) !== v : op === 'is' ? r[k] === v || (v === null && r[k] == null) : String(r[k]) === v); }
+    }
+    return rows;
+  }
+  function order(rows, spec) {
+    if (!spec) return rows;
+    const keys = spec.split(',').map(s => { const [col, ...mods] = s.split('.'); return { col, desc: mods.includes('desc'), nullsLast: mods.includes('nullslast') || (!mods.includes('nullsfirst') && !mods.includes('desc')) }; });
+    return rows.sort((a, b) => {
+      for (const k of keys) {
+        const x = a[k.col], y = b[k.col];
+        if (x == null && y == null) continue;
+        if (x == null) return k.nullsLast ? 1 : -1;
+        if (y == null) return k.nullsLast ? -1 : 1;
+        const c = typeof x === 'number' && typeof y === 'number' ? x - y : String(x) < String(y) ? -1 : String(x) > String(y) ? 1 : 0;
+        if (c) return k.desc ? -c : c;
+      }
+      return 0;
+    });
+  }
+  function project(rows, select) {
+    if (!select || select === '*') return rows.map(clone);
+    const cols = select.split(',').map(s => s.trim());
+    return rows.map(r => { const o = {}; cols.forEach(c => { o[c] = r[c] === undefined ? null : clone(r[c]); }); return o; });
+  }
+
+  // ---- files: kept as data URLs, images shrunk so a few uploads fit in the browser
+  const fileKey = (bucket, path) => FILE_KEY + bucket + '/' + path;
+  function readAsDataUrl(blob) { return new Promise((ok, no) => { const r = new FileReader(); r.onload = () => ok(r.result); r.onerror = () => no(r.error); r.readAsDataURL(blob); }); }
+  async function shrink(file) {
+    if (!/^image\/(jpeg|png|webp)$/.test(file.type) || file.size < 350 * 1024) return readAsDataUrl(file);
+    const url = await readAsDataUrl(file), img = new Image();
+    await new Promise((ok, no) => { img.onload = ok; img.onerror = no; img.src = url; });
+    const k = Math.min(1, 1400 / Math.max(img.naturalWidth, img.naturalHeight)), c = document.createElement('canvas');
+    c.width = Math.round(img.naturalWidth * k); c.height = Math.round(img.naturalHeight * k);
+    c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
+    return c.toDataURL(file.type === 'image/png' ? 'image/png' : 'image/jpeg', 0.85);
+  }
+  window.GYA_DEMO = {
+    user: USER,
+    fileUrl(bucket, path) { try { const f = JSON.parse(localStorage.getItem(fileKey(bucket, path)) || 'null'); return f && f.url; } catch (e) { return null; } },
+    // demo data, uploads, and the dashboard's own session and cache (gya.<site>.*); the shopper's cart is left alone
+    reset() { Object.keys(localStorage).forEach(k => { if (k === DB_KEY || k.startsWith(FILE_KEY) || /^gya\./.test(k)) localStorage.removeItem(k); }); },
+  };
+
+  // ---- request router
+  const json = (status, body) => new Response(status === 204 || body == null ? null : JSON.stringify(body), { status, headers: { 'Content-Type': 'application/json' } });
+  const isAdmin = init => { const h = (init && init.headers) || {}; const a = h.Authorization || h.authorization || ''; return a.startsWith('Bearer ' + TOKEN); };
+  function session() { const t = TOKEN + Math.random().toString(36).slice(2) + '.' + Date.now().toString(36);
+    return { access_token: t, refresh_token: 'r' + t, expires_in: 8 * 3600, token_type: 'bearer', user: { id: UID, email: USER } }; }
+  async function handle(url, init) {
+    const u = new URL(url), method = ((init && init.method) || 'GET').toUpperCase(), path = u.pathname;
+    const body = init && typeof init.body === 'string' ? JSON.parse(init.body || 'null') : init && init.body;
+    load();
+    if (path === '/auth/v1/token') {
+      if (u.searchParams.get('grant_type') === 'refresh_token') return json(200, session());
+      const okUser = String((body && body.email) || '').trim().toLowerCase() === USER.toLowerCase();
+      if (okUser && PASS && body.password === PASS) return json(200, session());
+      return json(400, { error: 'invalid_grant', error_description: 'Invalid login credentials' });
+    }
+    if (path === '/auth/v1/logout') return json(204, null);
+    const admin = isAdmin(init);
+    if (path.startsWith('/rest/v1/rpc/')) {
+      if (!admin) return json(403, { message: 'Not allowed' });
+      const fn = path.slice(13);
+      const out = fn === 'admin_save_product' ? saveProduct(body.p) : fn === 'admin_save_shipping' ? saveShipping(body.payload) : fn === 'admin_save_faqs' ? saveFaqs(body.set_key, body.items) : undefined;
+      if (out === undefined && !/^admin_save_(shipping|faqs)$/.test(fn)) return json(404, { message: `Unknown function ${fn}` });
+      persist(); return json(200, out);
+    }
+    if (path.startsWith('/rest/v1/')) {
+      const table = path.slice(9), T = TABLES[table];
+      if (!T) return json(404, { message: `Unknown table ${table}` });
+      const params = [...u.searchParams.entries()], get = k => u.searchParams.get(k);
+      if (method === 'GET') {
+        let rows = order(query(table, params, admin), get('order'));
+        const off = parseInt(get('offset') || '0', 10), lim = get('limit') ? parseInt(get('limit'), 10) : rows.length;
+        return json(200, project(rows.slice(off, off + lim), get('select')));
+      }
+      if (!admin) return json(403, { message: 'new row violates row-level security policy' });
+      const prefer = ((init && init.headers) || {}).Prefer || '';
+      if (method === 'POST') {
+        const key = get('on_conflict'), out = upsertRows(table, body, key);
+        persist(); return /return=representation/.test(prefer) ? json(201, clone(out)) : json(201, null);
+      }
+      if (method === 'DELETE') {
+        const hits = new Set(query(table, params, true));
+        const gone = removeWhere(table, r => hits.has(r)); persist(); return json(200, /return=representation/.test(prefer) ? clone(gone) : null);
+      }
+      if (method === 'PATCH') {
+        query(table, params, true).forEach(r => Object.assign(r, money(clone(body)))); persist(); return json(204, null);
+      }
+    }
+    if (path.startsWith('/storage/v1/object/list/')) {
+      const bucket = path.slice(24), prefix = (body && body.prefix) || '', start = FILE_KEY + bucket + '/' + prefix;
+      const out = Object.keys(localStorage).filter(k => k.startsWith(start)).map(k => { const f = JSON.parse(localStorage.getItem(k));
+        return { id: k, name: k.slice(start.length), created_at: f.at, metadata: { size: f.size, mimetype: f.type } }; }).filter(x => !x.name.includes('/'));
+      return json(200, out.sort((a, b) => a.name < b.name ? -1 : 1));
+    }
+    if (path.startsWith('/storage/v1/object/')) {
+      if (!admin) return json(403, { message: 'Not allowed' });
+      const rest = path.slice(19), bucket = rest.split('/')[0], file = decodeURIComponent(rest.slice(bucket.length + 1));
+      if (method === 'DELETE') { ((body && body.prefixes) || []).forEach(p => localStorage.removeItem(fileKey(bucket, p))); return json(200, []); }
+      const blob = init.body, type = (init.headers || {})['Content-Type'] || blob.type || '';
+      if (type === 'application/pdf' && blob.size > 1.5 * 1024 * 1024) return json(413, { message: 'In the demo, PDFs must be under 1.5 MB. The real dashboard takes up to 10 MB.' });
+      const url = await shrink(blob);
+      try { localStorage.setItem(fileKey(bucket, file), JSON.stringify({ url, type, size: Math.round(url.length * 0.75), at: now() })); }
+      catch (e) { return json(507, { message: 'This browser is out of demo storage. Use "Reset demo" in the dashboard, or upload smaller images.' }); }
+      return json(200, { Key: `${bucket}/${file}` });
+    }
+    return json(404, { message: 'Not available in the demo' });
+  }
+  const realFetch = window.fetch.bind(window);
+  window.fetch = function (input, init) {
+    const url = typeof input === 'string' ? input : input && input.url;
+    if (!url || !url.startsWith(BASE)) return realFetch(input, init);
+    return Promise.resolve().then(() => handle(url, init)).catch(e => json(e.status || 500, { message: e.message }));
+  };
+})();
+</script>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Avanti Print &amp; Design | Custom print &amp; packaging, made in Western Sydney</title>
 <meta name="description" content="Custom mailer boxes, shipping cartons, pull up banners, signage, peel &amp; stick wallpaper and cake toppers. Printed in-house in Western Sydney. Order by 12pm for next business day dispatch.">
@@ -299,10 +584,27 @@ p{margin:0 0 1em}
 .art-later small{display:block;color:var(--ink-3);margin-top:4px;margin-left:25px}
 .tpl-links{margin-top:14px;font-size:.82rem}
 .tpl-links a{color:var(--red);text-decoration:underline;margin-right:14px}
-.tpl-dl{margin:2px 0 14px;padding:10px 14px;background:var(--kraft-tint,#faf6ef);border:1.5px dashed var(--line);border-radius:var(--r);font-size:.82rem;line-height:2}
-.tpl-dl .tpl-h{display:block;font-family:var(--mono);font-size:.66rem;letter-spacing:.06em;color:var(--ink-3);line-height:1.4;margin-bottom:4px}
-.tpl-dl a{display:inline-block;color:var(--red);text-decoration:underline;margin-right:14px;white-space:nowrap}
-.tpl-dl .tpl-none{color:var(--ink-3)}
+.tpl-dl{margin:4px 0 16px}
+.tpl-dl .tpl-intro{margin:0 0 10px;font-size:.86rem;line-height:1.5;color:var(--ink-2,#55525a)}
+.tpl-acc{border:1px solid #d6d4d0;border-radius:6px;background:#fff;overflow:hidden}
+.tpl-acc summary{display:flex;align-items:center;gap:10px;padding:14px 18px;background:#ecebe8;cursor:pointer;list-style:none;user-select:none}
+.tpl-acc summary::-webkit-details-marker{display:none}
+.tpl-acc summary:focus-visible{outline:2px solid var(--red);outline-offset:-2px}
+.tpl-acc .tpl-t{font-weight:700;font-size:.98rem;color:#55535a;white-space:nowrap}
+.tpl-acc .tpl-meta{margin-left:auto;min-width:0;font-size:.76rem;color:var(--ink-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tpl-acc .tpl-chev{flex-shrink:0}
+@media (max-width:420px){.tpl-acc summary{padding:13px 14px}.tpl-acc .tpl-row{padding:12px 14px}.tpl-acc .tpl-meta{display:none}.tpl-acc .tpl-chev{margin-left:auto}}
+.tpl-acc .tpl-chev{width:0;height:0;border-left:7px solid transparent;border-right:7px solid transparent;border-top:9px solid #6d6b70;transition:transform .15s}
+.tpl-acc[open] .tpl-chev{transform:rotate(180deg)}
+.tpl-acc .tpl-list{max-height:330px;overflow-y:auto}
+.tpl-acc .tpl-row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 18px;border-top:1px solid #eceae6;color:var(--ink);text-decoration:none;font-size:.96rem}
+.tpl-acc .tpl-list .tpl-row:first-child{border-top:0}
+.tpl-acc .tpl-row:hover{background:#faf8f5;color:var(--red)}
+.tpl-acc .tpl-row small{color:var(--ink-3);font-size:.8rem;margin-left:4px}
+.tpl-acc .tpl-pdf{display:inline-flex;align-items:center;gap:5px;font-size:.72rem;font-weight:700;letter-spacing:.04em;color:var(--red);flex-shrink:0}
+.tpl-acc .tpl-none{margin:0;padding:14px 18px;font-size:.88rem;color:var(--ink-3)}
+.tpl-acc .tpl-foot{border-top:1px solid #eceae6;padding:10px 18px;background:#fcfbf9}
+.tpl-acc .tpl-all{background:none;border:0;padding:0;font:inherit;font-size:.84rem;font-weight:600;color:var(--red);text-decoration:underline;cursor:pointer}
 /* flat panel mockup (corflute / A-frame) */
 .bn-stage.panel{align-items:center;min-height:340px}
 .pn{position:relative;width:min(72%,300px)}
@@ -591,6 +893,9 @@ body.gya-admin-mode .topbar, body.gya-admin-mode .footer { display: none; }
 .gya-brand b { display: block; font-family: var(--g-display); font-size: 1.1rem; line-height: 1.15; }
 .gya-brand span, .gya-eyebrow { font-family: var(--g-mono); font-size: .68rem; letter-spacing: .08em; text-transform: uppercase; color: var(--g-red); }
 .gya-side nav { display: flex; flex-direction: column; gap: 2px; }
+.gya-demo-note { background: #fff6e0; border: 1px solid #f0d58a; color: #5a4300; border-radius: 8px; padding: 10px 12px; font-size: .82rem; line-height: 1.45; margin: 0 0 14px; }
+.gya-side .gya-demo-note { margin: 0; }
+.gya-demo-note .gya-link { display: block; margin-top: 6px; font-size: .82rem; }
 .gya-side nav a { padding: 9px 12px; border-radius: 8px; font-weight: 600; font-size: .9rem; color: var(--g-ink); text-decoration: none; }
 .gya-side nav a:hover { background: var(--g-paper); }
 .gya-side nav a.on { background: var(--g-ink); color: #fff; }
@@ -1049,6 +1354,10 @@ let SHIP_NOTE = 'Metro & Regional NSW courier items: our team will contact to co
 const TPL_P='2025/10/ARTWORK-SPEC-FORM-';
 const sixTpl=stub=>['600x400mm','600x600mm','600x800mm','800x1200mm','1200x1200mm','1200x2400mm']
   .map(s=>({l:s.replace('x',' × ').replace('mm',' mm'),f:TPL_P+stub+'-'+s+'.pdf'}));
+function BANNER_TPLS(){ return [
+  {l:'1400 × 850 mm', f:'2025/07/ARTWORK-SPEC-FORM-Roll-Up-Banner-1400x850mm.pdf'},
+  {l:'2200 × 850 mm', f:'2025/07/ARTWORK-SPEC-FORM-Roll-Up-Banner-2200x850mm.pdf'},
+]; }
 const TPLS = {
  'custom-branded-mailer-boxes':[{"l":"95 \u00d7 90 \u00d7 40 \u00b7 1.5mm bleed","f":"https://avantiprint.com.au/wp-content/uploads/2025/07/5mm-Mailer-Box-5mm-95x90x40mm.pdf","s":"95x90x40"},{"l":"95 \u00d7 90 \u00d7 40 \u00b7 3mm bleed","f":"https://avantiprint.com.au/wp-content/uploads/2025/07/Mailer-Box-95x90x40mm.pdf","s":"95x90x40"},{"l":"135 \u00d7 95 \u00d7 25 \u00b7 1.5mm bleed","f":"https://avantiprint.com.au/wp-content/uploads/2025/07/5mm-Mailer-Box-135x95x25mm.pdf","s":"135x95x25"},{"l":"135 \u00d7 95 \u00d7 25 \u00b7 3mm bleed","f":"https://avantiprint.com.au/wp-content/uploads/2025/07/Mailer-Box-135x95x25mm.pdf","s":"135x95x25"},{"l":"150 \u00d7 100 \u00d7 50 \u00b7 1.5mm bleed","f":"https://avantiprint.com.au/wp-content/uploads/2025/07/5mm-Mailer-Box-150x100x50mm.pdf","s":"150x100x50"},{"l":"150 \u00d7 100 \u00d7 50 \u00b7 3mm bleed","f":"https://avantiprint.com.au/wp-content/uploads/2025/07/Mailer-Box-150-x-100-x-50mm.pdf","s":"150x100x50"},{"l":"155 \u00d7 155 \u00d7 102 \u00b7 1.5mm bleed","f":"https://avantiprint.com.au/wp-content/uploads/2025/07/5mm-Mailer-Box-155x155x102mm.pdf","s":"155x155x102"},{"l":"155 \u00d7 155 \u00d7 102 \u00b7 3mm bleed","f":"https://avantiprint.com.au/wp-content/uploads/2025/07/Mailer-Box-155x155x102mm.pdf","s":"155x155x102"},{"l":"180 \u00d7 140 \u00d7 25 \u00b7 1.5mm bleed","f":"https://avantiprint.com.au/wp-content/uploads/2025/07/5mm-Mailer-Box-180x140x25mm.pdf","s":"180x140x25"},{"l":"180 \u00d7 140 \u00d7 25 \u00b7 3mm bleed","f":"https://avantiprint.com.au/wp-content/uploads/2025/07/Mailer-Box-180-x-140-x-25mm.pdf","s":"180x140x25"},{"l":"203 \u00d7 203 \u00d7 155 \u00b7 1.5mm bleed","f":"https://avantiprint.com.au/wp-content/uploads/2025/07/5mm-Mailer-Box-203x203x155mm.pdf","s":"203x203x155"},{"l":"203 \u00d7 203 \u00d7 155 \u00b7 3mm bleed","f":"https://avantiprint.com.au/wp-content/uploads/2025/07/Mailer-Box-203-x-203-x-155mm.pdf","s":"203x203x155"},{"l":"225 \u00d7 160 \u00d7 80 \u00b7 1.5mm bleed","f":"https://avantiprint.com.au/wp-content/uploads/2025/07/5mm-Mailer-Box-225x160x80.pdf","s":"225x160x80"},{"l":"225 \u00d7 160 \u00d7 80 \u00b7 3mm bleed","f":"https://avantiprint.com.au/wp-content/uploads/2025/07/Mailer-Box-225-x160-x-80mm-.pdf","s":"225x160x80"},{"l":"230 \u00d7 180 \u00d7 70 \u00b7 1.5mm bleed","f":"https://avantiprint.com.au/wp-content/uploads/2025/07/5mm-230x180x70mm.pdf","s":"230x180x70"},{"l":"230 \u00d7 180 \u00d7 70 \u00b7 3mm bleed","f":"https://avantiprint.com.au/wp-content/uploads/2025/07/Mailer-Box-230-x-180-x-70mm.pdf","s":"230x180x70"},{"l":"230 \u00d7 160 \u00d7 40 \u00b7 1.5mm bleed","f":"https://avantiprint.com.au/wp-content/uploads/2025/07/5mm-230x160x40mm.pdf","s":"230x160x40"},{"l":"230 \u00d7 160 \u00d7 40 \u00b7 3mm bleed","f":"https://avantiprint.com.au/wp-content/uploads/2025/07/Mailer-Box-230x160x40mm.pdf","s":"230x160x40"},{"l":"250 \u00d7 180 \u00d7 100 \u00b7 1.5mm bleed","f":"https://avantiprint.com.au/wp-content/uploads/2025/07/5mm-250x180x100.pdf","s":"250x180x100"},{"l":"250 \u00d7 180 \u00d7 100 \u00b7 3mm bleed","f":"https://avantiprint.com.au/wp-content/uploads/2025/07/Mailer-Box-250-x-180-x-100mm.pdf","s":"250x180x100"},{"l":"260 \u00d7 205 \u00d7 105 \u00b7 1.5mm bleed","f":"https://avantiprint.com.au/wp-content/uploads/2025/07/5mm-260x205x105mm.pdf","s":"260x205x105"},{"l":"260 \u00d7 205 \u00d7 105 \u00b7 3mm bleed","f":"https://avantiprint.com.au/wp-content/uploads/2025/07/Mailer-Box-260-x-205-x-105mm.pdf","s":"260x205x105"},{"l":"280 \u00d7 150 \u00d7 40 \u00b7 1.5mm bleed","f":"https://avantiprint.com.au/wp-content/uploads/2025/07/5mm-280x150x40mm.pdf","s":"280x150x40"},{"l":"280 \u00d7 150 \u00d7 40 \u00b7 3mm bleed","f":"https://avantiprint.com.au/wp-content/uploads/2025/07/Mailer-Box-280-x-150-x-40mm.pdf","s":"280x150x40"},{"l":"290 \u00d7 175 \u00d7 60 \u00b7 1.5mm bleed","f":"https://avantiprint.com.au/wp-content/uploads/2025/07/5mm-290x175x60mm.pdf","s":"290x175x60"},{"l":"290 \u00d7 175 \u00d7 60 \u00b7 3mm bleed","f":"https://avantiprint.com.au/wp-content/uploads/2025/07/Mailer-Box-290-x-175-x-60mm.pdf","s":"290x175x60"},{"l":"300 \u00d7 210 \u00d7 70 \u00b7 1.5mm bleed","f":"https://avantiprint.com.au/wp-content/uploads/2025/07/5mm-300x210x740mm.pdf","s":"300x210x70"},{"l":"300 \u00d7 210 \u00d7 70 \u00b7 3mm bleed","f":"https://avantiprint.com.au/wp-content/uploads/2025/07/Mailer-Box-300-x-210-x-70mm.pdf","s":"300x210x70"},{"l":"305 \u00d7 305 \u00d7 130 \u00b7 1.5mm bleed","f":"https://avantiprint.com.au/wp-content/uploads/2025/07/5mm-305x305x130mm.pdf","s":"305x305x130"},{"l":"305 \u00d7 305 \u00d7 130 \u00b7 3mm bleed","f":"https://avantiprint.com.au/wp-content/uploads/2025/07/Mailer-Box-305-x-305-x-130mm.pdf","s":"305x305x130"},{"l":"315 \u00d7 220 \u00d7 50 \u00b7 1.5mm bleed","f":"https://avantiprint.com.au/wp-content/uploads/2025/07/5mm-Mailer-Box-315x220x50mm.pdf","s":"315x220x50"},{"l":"315 \u00d7 220 \u00d7 50 \u00b7 3mm bleed","f":"https://avantiprint.com.au/wp-content/uploads/2025/07/Mailer-Box-315x220x50mm.pdf","s":"315x220x50"},{"l":"315 \u00d7 230 \u00d7 100 \u00b7 1.5mm bleed","f":"https://avantiprint.com.au/wp-content/uploads/2025/07/5mm-Mailer-Box-315x230x100mm.pdf","s":"315x230x100"},{"l":"315 \u00d7 230 \u00d7 100 \u00b7 3mm bleed","f":"https://avantiprint.com.au/wp-content/uploads/2025/07/Mailer-Box-315x230x100.pdf","s":"315x230x100"},{"l":"355 \u00d7 255 \u00d7 150 \u00b7 1.5mm bleed","f":"https://avantiprint.com.au/wp-content/uploads/2025/07/5mm-Mailer-Box-355x255x150mm.pdf","s":"355x255x150"},{"l":"355 \u00d7 255 \u00d7 150 \u00b7 3mm bleed","f":"https://avantiprint.com.au/wp-content/uploads/2025/07/Mailer-Box-355-x-255-x-150mm.pdf","s":"355x255x150"},{"l":"410 \u00d7 330 \u00d7 70 \u00b7 1.5mm bleed","f":"https://avantiprint.com.au/wp-content/uploads/2025/07/5mm-Mailer-Box-410-x-330-x-70mm.pdf","s":"410x330x70"},{"l":"410 \u00d7 330 \u00d7 70 \u00b7 3mm bleed","f":"https://avantiprint.com.au/wp-content/uploads/2025/07/Mailer-Box-410-x-330-x-70mm.pdf","s":"410x330x70"},{"l":"440 \u00d7 310 \u00d7 60 \u00b7 1.5mm bleed","f":"https://avantiprint.com.au/wp-content/uploads/2025/07/5mm-Mailer-Box-440x310x60mm.pdf","s":"440x310x60"},{"l":"440 \u00d7 310 \u00d7 60 \u00b7 3mm bleed","f":"https://avantiprint.com.au/wp-content/uploads/2025/07/Mailer-Box-440x310x60mm.pdf","s":"440x310x60"}],   /* live PDFs from the product page (21 Sep 2026); self-host into assets/templates/ later */
   'corflute-signs':  sixTpl('Corflute-Sign'),
@@ -1056,6 +1365,11 @@ const TPLS = {
   'foamboard':       sixTpl('Foam-Board'),
   'foam-pvc':        sixTpl('Foam-PVC'),
   'enviroboard':     sixTpl('Enviro-Board'),
+  // pull up banners: live uses the same two artwork templates on all four stands
+  'pull-up-banner':                             BANNER_TPLS(),
+  'premium-pull-up-banner-stands':              BANNER_TPLS(),
+  'double-sided-standard-pull-up-banner-stand': BANNER_TPLS(),
+  'double-sided-premium-pull-up-banner-stand':  BANNER_TPLS(),
   'posters': [
     {l:'A4 (210 × 297 mm)', f:TPL_P+'Posters-210x297mm-A4.pdf'},
     {l:'A3 (297 × 420 mm)', f:TPL_P+'Posters-297x420mm-A3.pdf'},
@@ -1290,7 +1604,7 @@ const GYA = (() => {
   const upsert = (table, rows, onConflict) => rest(`${table}?on_conflict=${onConflict}`, { method: 'POST', body: rows,
     prefer: 'resolution=merge-duplicates,return=representation' });
   const del = (table, filter) => rest(`${table}?${filter}`, { method: 'DELETE' });
-  const publicUrl = (bucket, path) => `${cfg.supabaseUrl}/storage/v1/object/public/${bucket}/${path.split('/').map(encodeURIComponent).join('/')}`;
+  const publicUrl = (bucket, path) => (window.GYA_DEMO && GYA_DEMO.fileUrl(bucket, path)) || `${cfg.supabaseUrl}/storage/v1/object/public/${bucket}/${path.split('/').map(encodeURIComponent).join('/')}`;
 
   /* ---------- storage ---------- */
   const ALLOWED = { image: /^image\/(jpeg|png|webp|gif|svg\+xml)$/, pdf: /^application\/pdf$/ };
@@ -1331,7 +1645,7 @@ const GYA = (() => {
     if (!enabled) throw new Error('The dashboard is not connected to a database yet. Add the Supabase URL and anon key to the config block.');
     const r = await fetch(`${cfg.supabaseUrl}/auth/v1/token?grant_type=password`, { method: 'POST',
       headers: { apikey: cfg.anonKey, 'Content-Type': 'application/json' }, body: JSON.stringify({ email, password }) });
-    if (!r.ok) { const e = await readError(r); throw new Error(/invalid/i.test(e.message) ? 'That email and password don\'t match an account.' : e.message); }
+    if (!r.ok) { const e = await readError(r); throw new Error(/invalid/i.test(e.message) ? (window.GYA_DEMO ? 'That username and password don\'t match.' : 'That email and password don\'t match an account.') : e.message); }
     setSession(await r.json());
     const ok = await loadProfile();
     if (!ok) { await signOut(); throw new Error('This account doesn\'t have dashboard access. Ask an administrator to grant it.'); }
@@ -1611,7 +1925,8 @@ const GYA = (() => {
     if (seg[0] === 'login') return `<div class="gya-admin gya-login"><form class="gya-card gya-login-card" id="gyaLogin" novalidate>
       <span class="gya-eyebrow">${esc(cfg.brand)}</span><h1>Staff sign in</h1>
       ${enabled ? '' : '<p class="gya-warn">This site isn\'t connected to its database yet, so signing in won\'t work until the Supabase URL and anon key are added to the config block.</p>'}
-      ${ui.field('Email', '<input class="gya-in" type="email" name="email" autocomplete="username" required>')}
+      ${window.GYA_DEMO ? '<p class="gya-demo-note"><b>Demo mode.</b> Changes are saved in this browser only. Nobody else sees them and nothing goes live.</p>' : ''}
+      ${window.GYA_DEMO ? ui.field('Username', '<input class="gya-in" type="text" name="email" autocomplete="username" autocapitalize="off" spellcheck="false" required>') : ui.field('Email', '<input class="gya-in" type="email" name="email" autocomplete="username" required>')}
       ${ui.field('Password', '<input class="gya-in" type="password" name="password" autocomplete="current-password" required>')}
       <p class="gya-err" id="gyaLoginErr" role="alert" hidden></p>
       <button class="gya-btn gya-btn-red" type="submit">Sign in</button>
@@ -1625,7 +1940,7 @@ const GYA = (() => {
       f.addEventListener('submit', async e => {
         e.preventDefault(); err.hidden = true;
         const email = f.email.value.trim(), pw = f.password.value;
-        if (!email || !pw) { err.textContent = 'Enter your email and password.'; err.hidden = false; return; }
+        if (!email || !pw) { err.textContent = window.GYA_DEMO ? 'Enter the username and password.' : 'Enter your email and password.'; err.hidden = false; return; }
         const b = qs('button[type=submit]', f); b.disabled = true; b.textContent = 'Signing in...';
         try { await signIn(email, pw); const next = new URLSearchParams(location.hash.split('?')[1] || '').get('next'); location.hash = next && next.startsWith('#/admin') ? next : '#/admin'; }
         catch (x) { err.textContent = x.message; err.hidden = false; b.disabled = false; b.textContent = 'Sign in'; }
@@ -1642,8 +1957,10 @@ const GYA = (() => {
         <nav>${sections.map(s => `<a href="#/admin/${s.id}" class="${s === current ? 'on' : ''}">${s.label}</a>`).join('')}</nav>
         <div class="gya-me"><span>${esc(state.profile.display_name || state.session.user.email)}</span>
           <a href="#/" class="gya-link">View site</a><button type="button" class="gya-link" id="gyaSignOut">Sign out</button></div>
+        ${window.GYA_DEMO ? '<div class="gya-demo-note"><b>Demo mode.</b> Changes are saved in this browser only and nothing goes live. <button type="button" class="gya-link" id="gyaDemoReset">Reset demo</button></div>' : ''}
       </aside><section class="gya-main" id="gyaMain"><p class="gya-muted">Loading...</p></section>`;
     qs('#gyaSignOut').onclick = async () => { if (state.dirty && !confirm('You have unsaved changes. Sign out anyway?')) return; state.dirty = false; await signOut(); location.hash = '#/login'; };
+    const dr = qs('#gyaDemoReset'); if (dr) dr.onclick = () => { if (!confirm('Put every price, post and page back to how it was, and remove uploaded files?')) return; state.dirty = false; GYA_DEMO.reset(); location.hash = '#/login'; location.reload(); };
     const main = qs('#gyaMain');
     try { await current.render(main, seg.slice(2), api); wireRte(main); wireImgPick(main); }
     catch (e) { main.innerHTML = `<div class="gya-card"><h3>Couldn't load this section</h3><p class="gya-err">${esc(e.message)}</p><button class="gya-btn gya-btn-line" onclick="location.reload()">Try again</button></div>`;
@@ -2231,8 +2548,14 @@ GYA.use({
     const M = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     const fmt = d => { if (!d) return undefined; const [y, m, dd] = d.split('-').map(Number); return `${dd} ${M[m - 1]} ${y}`; };
     if (rows.blog_posts) { POSTS.length = 0;
-      rows.blog_posts.forEach(b => POSTS.push(clean({ t: b.title, d: fmt(b.published_at), img: b.cover_url,
-        url: b.body_html ? '#/blog/' + b.slug : (b.legacy_url || '#/blog'), slug: b.slug, body: b.body_html, excerpt: b.excerpt }))); }
+      // a post's Google title and description live in seo_entries; keep them on the post so
+      // descriptions and seed exports work the same in every mode (alt text has no column yet)
+      const seo = Object.fromEntries((rows.seo_entries || []).map(e => [e.route, e]));
+      const alt = Object.fromEntries((typeof BLOG_DATA !== 'undefined' ? BLOG_DATA : []).map(x => [x.slug, x.alt]));
+      rows.blog_posts.forEach(b => { const e = seo['/blog/' + b.slug] || {};
+        POSTS.push(clean({ t: b.title, d: fmt(b.published_at), img: b.cover_url,
+          url: b.body_html ? '#/blog/' + b.slug : (b.legacy_url || '#/blog'), slug: b.slug, body: b.body_html, excerpt: b.excerpt,
+          seo: e.description || undefined, seoTitle: e.title || undefined, alt: alt[b.slug] || undefined })); }); }
     if (rows.pages && rows.pages.length) { Object.keys(PAGES).forEach(k => delete PAGES[k]); rows.pages.forEach(pg => { PAGES[pg.slug] = { t: pg.title, b: pg.body_html || '' }; }); }
     const F = by(rows.faqs, 'set_key');
     [['general', FAQ_GENERAL], ['banners', FAQ_BANNERS]].forEach(([key, arr]) => { if (F[key]) { arr.length = 0; F[key].sort(pos).forEach(q => arr.push([q.question, q.answer])); } });
@@ -2263,7 +2586,12 @@ GYA.use({
       }),
       blog_posts: POSTS.map(b => ({ slug: b.slug || GYA.slugify(b.t), title: b.t, excerpt: b.excerpt || null, body_html: b.body || null, cover_url: b.img || null,
         legacy_url: /^https?:/.test(b.url || '') ? b.url : null, published_at: iso(b.d), published: true })),
-      seo_entries: POSTS.filter(b => b.seo || b.seoTitle).map(b => ({ route: '/blog/' + b.slug, title: b.seoTitle || null, description: b.seo || null, og_image: null })),
+      // every SEO entry: whatever the database holds (products, pages, categories, posts), plus the
+      // built-in post SEO for any post the database has no entry for
+      seo_entries: (() => { const live = (typeof GYA !== 'undefined' && GYA.state && GYA.state.seo) || {};
+        const out = Object.values(live).map(e => ({ route: e.route, title: e.title || null, description: e.description || null, og_image: e.og_image || null }));
+        POSTS.filter(b => (b.seo || b.seoTitle) && !live['/blog/' + b.slug]).forEach(b => out.push({ route: '/blog/' + b.slug, title: b.seoTitle || null, description: b.seo || null, og_image: null }));
+        return out.sort((a, b) => a.route < b.route ? -1 : a.route > b.route ? 1 : 0); })(),
       pages: Object.entries(PAGES).map(([slug, pg]) => ({ slug, title: pg.t, body_html: pg.b, published: true })),
       faqs: { general: FAQ_GENERAL.map(([question, answer]) => ({ question, answer })), banners: FAQ_BANNERS.map(([question, answer]) => ({ question, answer })) },
       site_settings: [{ key: 'category_groups', value: GROUPS.slice() }, { key: 'ship_note', value: SHIP_NOTE }],
@@ -2702,10 +3030,6 @@ const BANNER_CFG = {
   'double-sided-premium-pull-up-banner-stand':{sides:2,premium:true},
 };
 const ART_PRINT = {w:850,h:2000};      /* visible print face, mm */
-const ART_TPLS = [
-  ['2200 × 850 mm', 'assets/templates/ARTWORK-SPEC-FORM-Roll-Up-Banner-2200x850mm.pdf'],
-  ['1400 × 850 mm', 'assets/templates/ARTWORK-SPEC-FORM-Roll-Up-Banner-1400x850mm.pdf'],
-];
 function tplUrl(f){ return /^https?:/.test(f) ? f : 'assets/templates/'+f.split('/').pop(); }
 function tplMatch(e, sizeVal){
   if(e.s){ return (sizeVal.match(/\d{2,4}/g)||[]).join('x')===e.s; }
@@ -2714,16 +3038,26 @@ function tplMatch(e, sizeVal){
   const pair=s=>(s.match(/\d{3,4}/g)||[]).map(Number).sort((x,y)=>x-y).join('x');
   const sv=pair(sizeVal); return !!sv && pair(e.f.split('/').pop())===sv;
 }
-function tplRender(p){
+/* Artwork templates as a dropdown, like the live site: collapsed until opened, and once a
+   size is chosen it lists just that size's PDFs (with a way back to the full list). */
+function tplRender(p, sizeChanged){
   const list=TPLS[p.s], box=document.getElementById('tplDl'); if(!list||!box) return;
   const sz=document.querySelector('[data-opt="Size"],[data-opt="Size (mm)"]'); const v=sz&&sz.value;
-  const link=e=>`<a href="${tplUrl(e.f)}" target="_blank" rel="noopener">${e.l} PDF</a>`;
-  if(v){ const hits=list.filter(e=>tplMatch(e,v));
-    box.innerHTML=`<span class="tpl-h">DOWNLOAD TEMPLATE, ${esc(v)}</span>`+
-      (hits.length?hits.map(link).join(' '):`<span class="tpl-none">No template published for this size yet, our team supplies full specs with your artwork proof.</span>`);
-  } else {
-    box.innerHTML=`<span class="tpl-h">ARTWORK TEMPLATES (choose a size above to filter)</span>`+list.map(link).join(' ');
-  }
+  const prev=box.querySelector('details');
+  if(sizeChanged) box.dataset.all='';
+  const all=box.dataset.all==='1', hits=v?list.filter(e=>tplMatch(e,v)):list, rows=(v&&!all)?hits:list;
+  const open=(prev&&prev.open)||(sizeChanged&&hits.length>0);
+  const row=e=>{ const [main,...more]=String(e.l).split(' · ');
+    return `<a class="tpl-row" href="${tplUrl(e.f)}" target="_blank" rel="noopener"><span class="tpl-l">${esc(main)}${more.length?` <small>${esc(more.join(' · '))}</small>`:''}</span><span class="tpl-pdf">PDF<svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true"><path d="M8 2v8m0 0 3.2-3.2M8 10 4.8 6.8M3 13h10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span></a>`; };
+  const count=n=>`${n} template${n===1?'':'s'}`;
+  const meta = v&&!all ? (hits.length?`${count(hits.length)} for ${esc(v)}`:`none for ${esc(v)}`) : count(list.length);
+  const body = rows.length ? rows.map(row).join('')
+    : `<p class="tpl-none">No template published for this size yet. Our team supplies full specs with your artwork proof.</p>`;
+  const toggle = v ? `<button type="button" class="tpl-all" data-tpl-all>${all?`Show only ${esc(v)}`:'Show all sizes'}</button>` : '';
+  box.innerHTML=`<p class="tpl-intro">We've provided artwork templates to help you set up your file. Choose a size to download the template to your device.</p>
+    <details class="tpl-acc"${open?' open':''}><summary><span class="tpl-t">Download Artwork Template</span><span class="tpl-meta">${meta}</span><span class="tpl-chev" aria-hidden="true"></span></summary>
+    <div class="tpl-list">${body}</div>${toggle?`<div class="tpl-foot">${toggle}</div>`:''}</details>`;
+  const b=box.querySelector('[data-tpl-all]'); if(b) b.onclick=()=>{ box.dataset.all=all?'':'1'; tplRender(p); };
 }
 const ISO_MM = {A4:{w:210,h:297},A3:{w:297,h:420},A2:{w:420,h:594},A1:{w:594,h:841},A0:{w:841,h:1189}};
 /* Print size in mm for the current selection: custom W×H fields, an A-size, or "600mm x 400mm" / "600mmW x 900mmH". */
@@ -2737,7 +3071,7 @@ function sizeMM(p, fallback){
 const STUDIO_PANEL_CATS=['acm-panels','foamboard','foam-pvc','enviroboard','posters','window-graphics','floor-decals'];
 function studioCfg(p){
   if(p.c==='pull-up-banners'){ const c=BANNER_CFG[p.s]||{sides:1,premium:false};
-    return {kind:'banner',sides:c.sides,premium:c.premium,autocopy:c.sides===2,tabs:['Front','Back'],tpls:true,
+    return {kind:'banner',sides:c.sides,premium:c.premium,autocopy:c.sides===2,tabs:['Front','Back'],
       print:()=>ART_PRINT}; }
   if(p.c==='corflute'){
     return {kind:'panel',edge:'flute',sides:2,backOptional:true,autocopy:false,tabs:['Front','Back'],
@@ -2811,7 +3145,6 @@ function artStudioHTML(p){
           <div class="row2"><label class="sm">Layout</label><div class="seg"><button id="modeFill" class="active">Fill banner</button><button id="modeFit">Fit whole artwork</button></div></div>
           <label class="chk"><input type="checkbox" id="safeChk" checked> Show safe area <span style="font-family:var(--mono);font-size:.66rem;color:var(--ink-3)">keep text inside the dashed line</span></label>
         </div>
-        ${cfg.tpls?`<div class="tpl-links"><span style="font-family:var(--mono);font-size:.68rem;color:var(--ink-3)">ARTWORK TEMPLATES&nbsp;&nbsp;</span>${ART_TPLS.map(([l,u])=>`<a href="${u}" target="_blank" rel="noopener">${l} PDF</a>`).join('')}</div>`:''}
       </div>
     </div>
   </section>`;
@@ -2989,7 +3322,7 @@ function wireProduct(){
   };
   $$('[data-img]').forEach(b=>b.onclick=()=>{ let m=$('#mainImg'); if(!m){ const holder=$('.gallery .main'); if(!holder) return; holder.querySelector('.ph')?.remove(); m=document.createElement('img'); m.id='mainImg'; holder.appendChild(m); } m.src=b.dataset.img; $$('[data-img]').forEach(x=>x.classList.remove('active')); b.classList.add('active'); });
   $$('[data-tab]').forEach(b=>b.onclick=()=>{ $$('[data-tab]').forEach(x=>x.classList.remove('active')); $$('[data-panel]').forEach(x=>x.classList.remove('active')); b.classList.add('active'); $(`[data-panel="${b.dataset.tab}"]`).classList.add('active'); });
-  if(TPLS[p.s]){ tplRender(p); const ts=document.querySelector('[data-opt="Size"],[data-opt="Size (mm)"]'); if(ts) ts.addEventListener('change',()=>tplRender(p)); }
+  if(TPLS[p.s]){ tplRender(p); const ts=document.querySelector('[data-opt="Size"],[data-opt="Size (mm)"]'); if(ts) ts.addEventListener('change',()=>tplRender(p,true)); }
   upd();
 }
 

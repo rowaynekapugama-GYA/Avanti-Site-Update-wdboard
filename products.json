@@ -4656,6 +4656,46 @@
     "f": "2025/10/ARTWORK-SPEC-FORM-Enviro-Board-1200x2400mm.pdf"
    }
   ],
+  "pull-up-banner": [
+   {
+    "l": "1400 × 850 mm",
+    "f": "2025/07/ARTWORK-SPEC-FORM-Roll-Up-Banner-1400x850mm.pdf"
+   },
+   {
+    "l": "2200 × 850 mm",
+    "f": "2025/07/ARTWORK-SPEC-FORM-Roll-Up-Banner-2200x850mm.pdf"
+   }
+  ],
+  "premium-pull-up-banner-stands": [
+   {
+    "l": "1400 × 850 mm",
+    "f": "2025/07/ARTWORK-SPEC-FORM-Roll-Up-Banner-1400x850mm.pdf"
+   },
+   {
+    "l": "2200 × 850 mm",
+    "f": "2025/07/ARTWORK-SPEC-FORM-Roll-Up-Banner-2200x850mm.pdf"
+   }
+  ],
+  "double-sided-standard-pull-up-banner-stand": [
+   {
+    "l": "1400 × 850 mm",
+    "f": "2025/07/ARTWORK-SPEC-FORM-Roll-Up-Banner-1400x850mm.pdf"
+   },
+   {
+    "l": "2200 × 850 mm",
+    "f": "2025/07/ARTWORK-SPEC-FORM-Roll-Up-Banner-2200x850mm.pdf"
+   }
+  ],
+  "double-sided-premium-pull-up-banner-stand": [
+   {
+    "l": "1400 × 850 mm",
+    "f": "2025/07/ARTWORK-SPEC-FORM-Roll-Up-Banner-1400x850mm.pdf"
+   },
+   {
+    "l": "2200 × 850 mm",
+    "f": "2025/07/ARTWORK-SPEC-FORM-Roll-Up-Banner-2200x850mm.pdf"
+   }
+  ],
   "posters": [
    {
     "l": "A4 (210 × 297 mm)",
